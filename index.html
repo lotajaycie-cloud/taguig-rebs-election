@@ -304,7 +304,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-betw
             <li class="stop" id="stop3">
               <div class="stop-date">Nov 14</div>
               <div class="stop-name">Results at our Tambike</div>
-              <div class="stop-desc">The new Lead and Co-Leads are announced.</div>
+              <div class="stop-desc">The new Lead and Co-Lead are announced.</div>
             </li>
           </ol>
         </div>
@@ -474,7 +474,7 @@ const CONFIG = {
   // Example: ["Kap Jun", "Kap Mark", "Kap Rey"]
   ELIGIBLE_OFFICERS: [],
   // Optional: ballot link to show during election week
-  VOTING_URL: ""
+  VOTING_URL: "/vote/"
 };
 /* ============================================================ */
 
@@ -547,7 +547,7 @@ const CONFIG = {
       meta.textContent = "Voting closes " + fmt(T.vClose, {weekday:"short", month:"short", day:"numeric"}) + ", 11:59 PM.";
     } else {
       title.textContent = "Results day";
-      meta.textContent = "The new Lead and Co-Leads are announced at our Tambike on Nov 14.";
+      meta.textContent = "The new Lead and Co-Lead are announced at our Tambike on Nov 14.";
     }
 
     const canSubmit = ph === "open" || DEMO || PREVIEW;
@@ -556,16 +556,19 @@ const CONFIG = {
     $("submitBtn").disabled = !canSubmit;
     $("lockNote").textContent = canSubmit ? (ph === "before" && DEMO ? "Preview: you can test the flow before Oct 28." : "")
       : "The form unlocks on " + fmt(T.open, {weekday:"long", month:"short", day:"numeric"}) + ".";
-    $("heroCta").textContent = ph === "open" || ph === "before" ? "Start your nomination" : "See the dates";
-    $("heroCta").href = ph === "open" || ph === "before" ? "#nominate" : "#datesTitle";
+    const toBallot = !!CONFIG.VOTING_URL && (ph === "closed" || ph === "voting");
+    const ballotLabel = ph === "voting" ? "Go to the ballot" : "See the nominees";
+    $("heroCta").textContent = ph === "open" || ph === "before" ? "Start your nomination" : toBallot ? ballotLabel : "See the dates";
+    $("heroCta").href = ph === "open" || ph === "before" ? "#nominate" : toBallot ? CONFIG.VOTING_URL : "#datesTitle";
+    const bb = $("ballotBtn");
+    if (toBallot) { bb.href = CONFIG.VOTING_URL; bb.textContent = ballotLabel; bb.style.display = "inline-flex"; } else bb.style.display = "none";
 
     if (ph === "voting") {
       $("closedTitle").textContent = "Election week is on";
       $("closedText").textContent = "Nominations are closed. Official members cast their votes from Nov 9 to 13.";
-      if (CONFIG.VOTING_URL) { const b = $("ballotBtn"); b.href = CONFIG.VOTING_URL; b.style.display = "inline-flex"; }
     } else if (ph === "results") {
       $("closedTitle").textContent = "Thank you, Kaps";
-      $("closedText").textContent = "Nominations and voting are done. The new Lead and Co-Leads are announced at our Tambike on Nov 14.";
+      $("closedText").textContent = "Nominations and voting are done. The new Lead and Co-Lead are announced at our Tambike on Nov 14.";
     }
 
     // stops
