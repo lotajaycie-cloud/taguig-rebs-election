@@ -3,7 +3,6 @@
   TAGUIG REBS · Lead & Co-Lead ballot (served at /vote/)
   ------------------------------------------------------------
   - Voting window: Nov 9 – 13, 2026, Manila time. Locked outside it.
-    Add ?preview=1 to the URL to test outside the window.
   - Each Kap types his name, then picks one Lead and one Co-Lead.
   - Ballots post to the "Taguig Rebs | Election Ballot 2026" Google Form.
     The "Ballots & Tally" Google Sheet counts the first vote under each
@@ -426,11 +425,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-betw
    CONFIG: edit this block only
    ============================================================ */
 const CONFIG = {
-  FORM_ACTION: "https://docs.google.com/forms/d/e/YOUR_BALLOT_FORM_ID/formResponse",
+  FORM_ACTION: "https://docs.google.com/forms/d/e/1FAIpQLSfd0TtK2GLTPBnilX97g-RAumGtM3kjv0osGwEPX9b37ZRrJg/formResponse",
   ENTRY: {
-    voter:  "entry.2000000001",
-    lead:   "entry.2000000002",
-    coLead: "entry.2000000003"
+    voter:  "entry.1837481174",
+    lead:   "entry.729791139",
+    coLead: "entry.1351120068"
   },
   // Manila time (+08:00)
   NOMINATION_OPENS:  "2026-10-28T00:00:00+08:00",
@@ -441,7 +440,9 @@ const CONFIG = {
   // Spell these exactly as in the setup script: the tally matches on them.
   LEAD:    ["Noel Fortaleza", "Jeus Rivera", "Jhe Valera", "Pakito"],
   CO_LEAD: ["Nad Pangilinan", "Frank", "Robinson"],
-  SHUFFLE: true
+  SHUFFLE: true,
+  // true lets ?preview=1 open the ballot outside Nov 9-13 for testing. Keep false when live.
+  ALLOW_PREVIEW: true
 };
 /* ============================================================ */
 
@@ -452,12 +453,16 @@ const CONFIG = {
     open: new Date(CONFIG.VOTING_OPENS), close: new Date(CONFIG.VOTING_CLOSES), results: new Date(CONFIG.RESULTS_DAY)
   };
   const DEMO = /YOUR_BALLOT_FORM_ID/.test(CONFIG.FORM_ACTION);
-  const PREVIEW = /[?&]preview=1\b/.test(location.search);
+  const PREVIEW = CONFIG.ALLOW_PREVIEW && /[?&]preview=1\b/.test(location.search);
   const STORE_KEY = "trebs-vote-2026";
   const fmt = (d, o) => new Intl.DateTimeFormat("en-US", Object.assign({timeZone:"Asia/Manila"}, o)).format(d);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   if (DEMO) $("demoBar").classList.add("show");
+  else if (PREVIEW && phaseAt(new Date()) !== "open") {
+    $("demoBar").textContent = "Test mode: voting isn't open, so use this only for test votes.";
+    $("demoBar").classList.add("show");
+  }
 
   /* ---------- candidate tiles ---------- */
   const tickSvg = '<svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 4.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
